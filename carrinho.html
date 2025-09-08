@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho - Império Streetwear</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #800020;
+    }
+
+    .btn-voltar {
+      display: inline-block;
+      margin-bottom: 2rem;
+      background-color: #800020;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #fff;
+      color: #800020;
+    }
+
+    .carrinho {
+      max-width: 800px;
+      margin: auto;
+      background-color: #111;
+      padding: 2rem;
+      border-radius: 12px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid #333;
+    }
+
+    .item-info {
+      flex: 1;
+      margin-left: 1rem;
+    }
+
+    .item-info h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .preco {
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .quantidade {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quantidade button {
+      background-color: #800020;
+      color: #fff;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .quantidade button:hover {
+      background-color: #fff;
+      color: #800020;
+    }
+
+    .remover {
+      background: none;
+      border: none;
+      color: red;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .total {
+      text-align: right;
+      margin-top: 1.5rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #800020;
+    }
+
+    .finalizar {
+      display: block;
+      margin: 2rem auto 0;
+      background-color: #800020;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      text-align: center;
+      transition: 0.3s;
+      max-width: 300px;
+    }
+
+    .finalizar:hover {
+      background-color: #fff;
+      color: #800020;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+  <h1>Meu Carrinho</h1>
+
+  <div class="carrinho" id="lista-carrinho"></div>
+  <div class="total" id="total"></div>
+  <a href="#" id="btn-finalizar" class="finalizar">Finalizar Compra no WhatsApp</a>
+
+  <script>
+    function renderCarrinho() {
+      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      let lista = document.getElementById('lista-carrinho');
+      let totalDiv = document.getElementById('total');
+      lista.innerHTML = "";
+      let total = 0;
+
+      if (carrinho.length === 0) {
+        lista.innerHTML = "<p style='text-align:center;'>Seu carrinho está vazio 😢</p>";
+        totalDiv.innerHTML = "";
+        return;
+      }
+
+      carrinho.forEach((item, index) => {
+        let div = document.createElement('div');
+        div.classList.add('item');
+        div.innerHTML = `
+          <div class="item-info">
+            <h3>${item.nome}</h3>
+            <p class="preco">R$ ${(item.preco * item.quantidade).toFixed(2)}</p>
+          </div>
+          <div class="quantidade">
+            <button onclick="alterarQtd(${index}, -1)">-</button>
+            <span>${item.quantidade}</span>
+            <button onclick="alterarQtd(${index}, 1)">+</button>
+          </div>
+          <button class="remover" onclick="removerItem(${index})">❌</button>
+        `;
+        lista.appendChild(div);
+        total += item.preco * item.quantidade;
+      });
+
+      totalDiv.innerHTML = "Total: R$ " + total.toFixed(2);
+    }
+
+    function alterarQtd(index, delta) {
+      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      if (!carrinho[index]) return;
+      carrinho[index].quantidade += delta;
+      if (carrinho[index].quantidade <= 0) {
+        carrinho.splice(index, 1); // remove item se quantidade zerar
+      }
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      renderCarrinho();
+    }
+
+    function removerItem(index) {
+      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      carrinho.splice(index, 1);
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      renderCarrinho();
+    }
+
+    // Botão finalizar -> WhatsApp
+    document.getElementById('btn-finalizar').addEventListener('click', function(e) {
+      e.preventDefault();
+      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
+      }
+
+      let mensagem = "Olá, quero finalizar minha compra:%0A%0A";
+      let total = 0;
+      carrinho.forEach(item => {
+        mensagem += `- ${item.nome} (x${item.quantidade}): R$ ${(item.preco * item.quantidade).toFixed(2)}%0A`;
+        total += item.preco * item.quantidade;
+      });
+      mensagem += `%0ATotal: R$ ${total.toFixed(2)}`;
+
+      window.open(`https://wa.me/5516997033586?text=${mensagem}`, "_blank");
+    });
+
+    renderCarrinho();
+  </script>
+</body>
+</html>

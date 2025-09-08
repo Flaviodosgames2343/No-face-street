@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> NO FACE </title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; scroll-behavior: smooth; }
+    body { background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%); color: #f5f9ff; }
+
+    /* Loader */
+    #loader {
+      position: fixed; inset: 0; background: #0a0a0a;
+      display: flex; align-items: center; justify-content: center;
+      color: #fcffb4ff; font-size: 1.1rem; z-index: 2000;
+      letter-spacing: .5px;
+    }
+
+    header {
+      background: linear-gradient(90deg, rgba(44,44,44,0.95), rgba(20,20,20,0.95));
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; border-bottom: 2px solid #800020;
+      position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+      animation: slideDown 0.8s ease;
+    }
+    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    header h1 { font-size: 1.8rem; font-weight: bold; color: #fff; letter-spacing: 1px; }
+    nav { display: flex; gap: 1rem; align-items: center; }
+    nav a { text-decoration: none; color: #fff; font-weight: bold; transition: 0.3s; padding: 0.5rem; border-radius: 6px; }
+    nav a:hover { background: #fcffb4ff; color: #000; transform: scale(1.05); }
+
+    .cart-btn {
+      position: relative; background-color: #800020; color: #fff;
+      padding: 0.6rem; border-radius: 50%; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; cursor: pointer; box-shadow: 0 0 10px rgba(128,0,32,0.5);
+    }
+    .cart-btn:hover { background-color: #fcffb4ff; color: #000; transform: rotate(10deg) scale(1.1); }
+    .cart-count {
+      position: absolute; top: -5px; right: -5px; background: #fff; color: #000;
+      font-size: 0.8rem; font-weight: bold; border-radius: 50%; padding: 2px 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.6);
+    }
+
+    .menu-btn { font-size: 1.8rem; background: none; border: none; color: #f5f9ff; cursor: pointer; margin-right: 1rem; transition: 0.3s; }
+    .menu-btn:hover { transform: scale(1.2); color: #fcffb4ff; }
+
+    .promo {
+      background: linear-gradient(90deg, #800020, #640000);
+      text-align: center; padding: 0.6rem; font-weight: bold; color: #fff;
+      position: sticky; top: 68px; z-index: 900; animation: piscar 1.5s infinite alternate;
+    }
+    @keyframes piscar { from { opacity: 1; } to { opacity: 0.7; } }
+
+    .menu-lateral {
+      position: fixed; top: 0; left: -250px; width: 220px; height: 100%;
+      background: #2c2c2c; border-right: 2px solid #800020; padding: 2rem 1rem; transition: 0.3s; z-index: 1000;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.6);
+    }
+    .menu-lateral.ativo { left: 0; }
+    .menu-lateral h2 { color: #fcffb4ff; font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; text-shadow: 0 0 6px #800020; }
+    .menu-lateral a { display: block; color: #cfd9ff; text-decoration: none; padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; transition: 0.3s; }
+    .menu-lateral a:hover { background: #800020; color: #fff; transform: translateX(5px); }
+
+    .hero {
+      text-align: center; padding: 4rem 2rem; color: #fff; min-height: 80vh;
+      display: flex; flex-direction: column; justify-content: center;
+      background: url('https://images.unsplash.com/photo-1520975918311-33e74b5d7e44?auto=format&fit=crop&w=1200&q=60') center/cover no-repeat;
+      position: relative; overflow: hidden;
+    }
+    .hero::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+    .hero h2, .hero p, .hero a, .extra-btns { position: relative; z-index: 2; }
+    .hero h2 { font-size: 3rem; margin-bottom: 1rem; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.9); }
+    .hero p { font-size: 1.2rem; margin-bottom: 2rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
+    .hero a { background-color: #fcffb4ff; color: #000; padding: 0.8rem 1.5rem; border-radius: 10px; font-size: 1.1rem; text-decoration: none; transition: 0.3s; font-weight: bold; box-shadow: 0 0 15px rgba(252,255,180,0.6); }
+    .hero a:hover { background-color: #800020; color: #fff; transform: scale(1.1); }
+
+    .produtos { padding: 3rem 2rem; background-color: rgba(20,20,20,0.95); }
+    .produtos h2 { text-align: center; font-size: 2.5rem; margin-bottom: 2rem; color: #fcffb4ff; text-shadow: 0 0 10px #800020; }
+
+    /* Barra de busca */
+    .busca { text-align: center; margin-bottom: 2rem; }
+    .busca input { padding: 0.7rem; border-radius: 8px; border: none; width: 80%; max-width: 420px; font-size: 1rem; outline: none; }
+
+    .grid-produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+    .card { background-color: #2c2c2c; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.6); transition: transform 0.3s, box-shadow 0.3s; }
+    .card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 8px 25px rgba(0,0,0,0.8); }
+    .card img { width: 100%; height: 300px; object-fit: cover; transition: 0.4s; }
+    .card:hover img { transform: scale(1.1); }
+    .card .info { padding: 1rem; text-align: center; }
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #f5f9ff; }
+    .card p { font-size: 1rem; margin-bottom: 1rem; color: #bbb; }
+
+    /* Estrelas fake */
+    .stars { color: gold; font-size: 1rem; margin-bottom: 0.5rem; }
+
+    /* Botões no card */
+    .card .acoes { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+    .card a, .card button { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; text-decoration: none; transition: 0.3s; cursor: pointer; }
+    .card a.addCarrinho { background-color: #fcffb4ff; color: #000; box-shadow: 0 0 8px rgba(252,255,180,0.5); }
+    .card a.addCarrinho:hover { background-color: #800020; color: #fff; transform: scale(1.05); }
+    .card button.comprarAgora { background: #c90000; color: #000; border: none; box-shadow: 0 0 8px rgb(115, 0, 0); }
+    .card button.comprarAgora:hover { background: rgb(62, 5, 5); color: #fff; transform: scale(1.05); }
+
+    /* Benefícios */
+    .beneficios { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 3rem 1rem; text-align: center; }
+    .beneficio { background: #2c2c2c; padding: 1rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+
+    /* Newsletter */
+    .newsletter { text-align: center; padding: 2rem; background: #111; margin: 2rem 0; }
+    .newsletter input { padding: 0.7rem; border-radius: 8px; border: none; width: 60%; max-width: 300px; margin-right: 0.5rem; outline: none; }
+    .newsletter button { padding: 0.7rem 1.2rem; background: #800020; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; transition: .3s; }
+    .newsletter button:hover { background: #fcffb4ff; color: #000; }
+
+    footer { background-color: #0a0a0a; text-align: center; padding: 1rem; margin-top: 2rem; color: #40e0d0; border-top: 2px solid #800020; font-size: 0.9rem; }
+    footer small { display: block; margin-top: 0.5rem; color: #bbb; font-size: 0.8rem; }
+
+    /* === Adições necessárias que estavam faltando (carrinho, flutuantes, modal) === */
+    .carrinho {
+      position: fixed; top: 0; right: -400px; width: 350px; height: 100%;
+      background: #2c2c2c; border-left: 2px solid #800020;
+      display: flex; flex-direction: column;
+      transition: 0.4s ease; z-index: 1000; color: #f5f9ff;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.8);
+    }
+    .carrinho.ativo { right: 0; }
+    .carrinho h2 { margin-bottom: 1rem; color: #fcffb4ff; padding: 0 1rem; }
+    .carrinho-conteudo { flex: 1; overflow-y: auto; padding: 1rem; }
+    .item-carrinho { display: flex; justify-content: space-between; align-items: center; margin: 1rem 0; background: #1a1a1a; padding: 0.5rem; border-radius: 6px; gap: .5rem; }
+    .item-carrinho span { flex: 1; }
+    .qtd-btn { padding: 0.2rem 0.6rem; margin: 0 0.3rem; cursor: pointer; background: #444; color: #fff; border: none; border-radius: 4px; transition: 0.3s; }
+    .qtd-btn:hover { background: #fcffb4ff; color: #000; }
+    .item-carrinho button.remover { background: #800020; border: none; color: #fff; padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+    .item-carrinho button.remover:hover { background: #fcffb4ff; color: #000; }
+    .total { font-weight: bold; font-size: 1.2rem; text-align: center; color: #fcffb4ff; margin: 0.5rem 0; }
+    .carrinho-footer { padding: 1rem; border-top: 2px solid #800020; background: #1a1a1a; }
+    .finalizar-btn { width: 100%; padding: 0.8rem; background: #fcffb4ff; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 0 10px rgba(252,255,180,0.6); }
+    .finalizar-btn:hover { background: #800020; color: #fff; transform: scale(1.05); }
+
+    .extra-btns { display: flex; gap: 0.8rem; margin-top: 1rem; justify-content: center; flex-wrap: wrap; }
+    .extra-btns button { background: #800020; color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 8px rgba(128,0,32,0.6); }
+    .extra-btns button:hover { background: #fcffb4ff; color: #000; transform: scale(1.05); }
+
+    .float-actions { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 1200; }
+    .float-actions a, .float-actions button {
+      background: #25d366; color: #000; border: none; padding: 0.8rem 1rem;
+      border-radius: 999px; font-weight: bold; cursor: pointer; text-decoration: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    .float-actions .topo { background: #fcffb4ff; }
+    .float-actions a:hover, .float-actions button:hover { filter: brightness(0.95); transform: translateY(-2px); }
+
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); z-index: 1300; }
+    .modal.ativo { display: flex; }
+    .modal-card { background: #1c1c1c; border: 2px solid #800020; border-radius: 12px; max-width: 520px; width: 92%; padding: 1.2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.7); }
+    .modal-card h3 { margin-bottom: 0.6rem; color: #fcffb4ff; }
+    .modal-card p { color: #ddd; line-height: 1.5; }
+    .fechar-modal { margin-top: 1rem; background: #800020; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+    .fechar-modal:hover { background: #fcffb4ff; color: #000; }
+
+    /* Acessibilidade suave */
+    .visually-hidden { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  </style>
+</head>
+
+<body>
+  <div id="loader" aria-live="polite">⏳ Carregando a loja…</div>
+
+  <header>
+    <button class="menu-btn" id="abrirMenu" aria-label="Abrir menu lateral">☰</button>
+    <h1> NO FACE </h1>
+    <nav>
+      <a href="https://wa.me/5516997033586" target="_blank" rel="noopener noreferrer">Contato</a>
+      <a href="categorias.html" target="_blank" rel="noopener noreferrer">Categorias</a>
+      <a href="#comprar">Comprar</a>
+      <div class="cart-btn" id="abrirCarrinho" title="Abrir carrinho" aria-label="Abrir carrinho">
+        🛒
+        <span class="cart-count" id="cartCount" aria-live="polite">0</span>
+      </div>
+    </nav>
+  </header>
+
+  <div class="promo">🔥 30% DE DESCONTO em toda a coleção! Aproveite agora 🔥</div>
+
+  <aside class="menu-lateral" id="menuLateral">
+    <h2>Categorias</h2>
+    <a href="#blusas">Blusas</a>
+    <a href="#moletons">Moletons</a>
+    <a href="#calcas">Calças</a>
+    <a href="#acessorios">Acessórios</a>
+  </aside>
+
+  <section class="hero">
+    <h2> NO FACE é Identidade</h2>
+    <p>Mais que roupas, uma expressão de atitude e verdade.</p>
+    <a href="#comprar" id="comprarAgora">Compre Agora</a>
+    <div class="extra-btns">
+      <button id="btnSobre">Sobre Nós</button>
+      <button id="btnNovidades">Novidades</button>
+      <button id="btnSuporte">Suporte</button>
+      <button id="btnInstagram">Instagram</button>
+    </div>
+  </section>
+
+  <section class="produtos" id="comprar">
+    <h2>Nossos Produtos</h2>
+
+    <div class="busca">
+      <label for="campoBusca" class="visually-hidden">Buscar produtos</label>
+      <input type="text" id="campoBusca" placeholder="🔍 Buscar produtos...">
+    </div>
+
+    <div class="grid-produtos" id="listaProdutos">
+      <div class="card" data-nome="Blusa r9">
+        <img src="Brazil (13).png" alt="Blusa r9">
+        <div class="info">
+          <h3>Blusa r9</h3>
+          <div class="stars">⭐⭐⭐⭐☆</div>
+          <p>R$ 129,90</p>
+          <div class="acoes">
+            <a href="#" class="addCarrinho">Adicionar ao carrinho</a>
+            <button class="comprarAgora">Comprar agora</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" data-nome="Moletom Império">
+        <img src="Brazil (12).png" alt="Moletom Império">
+        <div class="info">
+          <h3>Moletom Império</h3>
+          <div class="stars">⭐⭐⭐⭐⭐</div>
+          <p>R$ 199,90</p>
+          <div class="acoes">
+            <a href="#" class="addCarrinho">Adicionar ao carrinho</a>
+            <button class="comprarAgora">Comprar agora</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" data-nome="Moletom Império">
+        <img src="Imagem do WhatsApp de 2025-09-01 à(s) 17.49.54_95afd6f6.jpg" alt="Moletom Império">
+        <div class="info">
+          <h3>Moletom Império</h3>
+          <div class="stars">⭐⭐⭐⭐☆</div>
+          <p>R$ 199,90</p>
+          <div class="acoes">
+            <a href="#" class="addCarrinho">Adicionar ao carrinho</a>
+            <button class="comprarAgora">Comprar agora</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" data-nome="Moletom Império">
+        <img src="Brazil (10).png" alt="Moletom Império">
+        <div class="info">
+          <h3>Moletom Império</h3>
+          <div class="stars">⭐⭐⭐☆☆</div>
+          <p>R$ 199,90</p>
+          <div class="acoes">
+            <a href="#" class="addCarrinho">Adicionar ao carrinho</a>
+            <button class="comprarAgora">Comprar agora</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="beneficios">
+    <div class="beneficio">🚚 Frete grátis acima de R$ 299</div>
+    <div class="beneficio">↩️ Troca grátis em até 7 dias</div>
+    <div class="beneficio">📞 Suporte rápido via WhatsApp</div>
+    <div class="beneficio">🔒 Compra 100% segura</div>
+  </section>
+
+  <section class="newsletter">
+    <h2>📩 Receba nossas novidades</h2>
+    <p>Cadastre-se e ganhe ofertas exclusivas!</p>
+    <input type="email" id="emailNews" placeholder="Seu e-mail">
+    <button id="btnNews">Cadastrar</button>
+  </section>
+
+  <div class="carrinho" id="carrinho" aria-hidden="true">
+    <div class="carrinho-conteudo">
+      <button id="sairCarrinho" style="background:#6d0000;color:#000;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:bold;margin-bottom:1rem;">✕ Sair</button>
+      <h2>🛒 Carrinho</h2>
+      <div id="listaCarrinho"></div>
+    </div>
+    <div class="carrinho-footer">
+      <div class="total" id="totalCarrinho">Total: R$ 0,00</div>
+      <button class="finalizar-btn" id="finalizarCompra">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 NO FACE - Todos os direitos reservados.</p>
+    <small>Pagamentos protegidos. Seus dados estão seguros conosco.</small>
+  </footer>
+
+  <!-- Ações flutuantes -->
+  <div class="float-actions">
+    <a href="https://wa.me/5516997033586?text=Ol%C3%A1%2C%20vim%20do%20site%20Ruas%20de%20Fortal%20e%20preciso%20de%20ajuda" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <button class="topo" id="btnTopo">↑ Topo</button>
+  </div>
+
+  <!-- Modal Sobre Nós -->
+  <div class="modal" id="modalSobre" role="dialog" aria-modal="true" aria-labelledby="tituloSobre">
+    <div class="modal-card">
+      <h3 id="tituloSobre">Sobre Nós</h3>
+      <p> NO FACE é mais que uma marca, é a voz das quebradas. Cada estampa, cada peça, carrega a força de quem cresceu no calor do asfalto e transformou dificuldade em identidade. Aqui, moda não é luxo — é resistência, é cultura, é orgulho das nossas origens. Somos viela, somos becos, somos a batida do gueto que ecoa em cada esquina de Fortaleza. Vestir Ruas de Fortal é carregar no peito a coragem de ser quem a gente é: real, raiz e sempre de cabeça erguida.</p>
+      <button class="fechar-modal" id="fecharSobre">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    // ====== Seletores
+    const abrirCarrinho = document.getElementById("abrirCarrinho");
+    const carrinho = document.getElementById("carrinho");
+    const listaCarrinho = document.getElementById("listaCarrinho");
+    const botoesAdicionar = () => document.querySelectorAll(".addCarrinho");
+    const botoesComprarAgora = () => document.querySelectorAll(".comprarAgora");
+    const comprarAgoraAnchor = document.getElementById("comprarAgora");
+    const abrirMenu = document.getElementById("abrirMenu");
+    const menuLateral = document.getElementById("menuLateral");
+    const sairCarrinho = document.getElementById("sairCarrinho");
+    const cartCount = document.getElementById("cartCount");
+    const totalCarrinho = document.getElementById("totalCarrinho");
+    const finalizarCompra = document.getElementById("finalizarCompra");
+    const campoBusca = document.getElementById("campoBusca");
+    const loader = document.getElementById("loader");
+
+    // Botões extras
+    const btnSobre = document.getElementById("btnSobre");
+    const btnNovidades = document.getElementById("btnNovidades");
+    const btnSuporte = document.getElementById("btnSuporte");
+    const btnInstagram = document.getElementById("btnInstagram");
+    const modalSobre = document.getElementById("modalSobre");
+    const fecharSobre = document.getElementById("fecharSobre");
+    const btnTopo = document.getElementById("btnTopo");
+
+    // ====== Estado
+    let itensCarrinho = [];
+
+    // ====== Utils
+    const BRLToNumber = (txt) => {
+      // Aceita "R$ 1.299,90" e "129,90"
+      const limpo = String(txt).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+      const n = parseFloat(limpo);
+      return isNaN(n) ? 0 : n;
+    };
+    const numberToBRL = (n) => n.toFixed(2).replace('.', ',');
+
+    const salvarLocal = () => localStorage.setItem('rf_cart', JSON.stringify(itensCarrinho));
+    const carregarLocal = () => {
+      try {
+        const salvo = JSON.parse(localStorage.getItem('rf_cart') || '[]');
+        if (Array.isArray(salvo)) itensCarrinho = salvo;
+      } catch(e) { itensCarrinho = []; }
+    };
+
+    // ====== Carrinho
+    function atualizarCarrinho() {
+      listaCarrinho.innerHTML = "";
+      let total = 0;
+      itensCarrinho.forEach((item, index) => {
+        const precoNum = BRLToNumber(item.preco);
+        total += precoNum * item.qtd;
+
+        const div = document.createElement("div");
+        div.className = "item-carrinho";
+        div.innerHTML = `
+          <span>${item.nome} - R$ ${numberToBRL(precoNum)}</span>
+          <div>
+            <button class="qtd-btn" data-idx="${index}" data-delta="-1">-</button>
+            <strong>${item.qtd}</strong>
+            <button class="qtd-btn" data-idx="${index}" data-delta="1">+</button>
+            <button class="remover" data-remove="${index}">X</button>
+          </div>`;
+        listaCarrinho.appendChild(div);
+      });
+
+      totalCarrinho.textContent = "Total: R$ " + numberToBRL(total);
+      cartCount.textContent = itensCarrinho.reduce((s, i) => s + i.qtd, 0);
+      salvarLocal();
+    }
+
+    function removerItem(i) {
+      itensCarrinho.splice(i, 1);
+      atualizarCarrinho();
+    }
+
+    function alterarQtd(i, d) {
+      itensCarrinho[i].qtd += d;
+      if (itensCarrinho[i].qtd <= 0) removerItem(i);
+      else atualizarCarrinho();
+    }
+
+    // Delegação de eventos dentro do carrinho (menos reflows)
+    listaCarrinho.addEventListener('click', (e) => {
+      const tgt = e.target;
+      if (tgt.matches('[data-remove]')) {
+        removerItem(parseInt(tgt.getAttribute('data-remove')));
+      }
+      if (tgt.matches('[data-delta]')) {
+        const idx = parseInt(tgt.getAttribute('data-idx'));
+        const d = parseInt(tgt.getAttribute('data-delta'));
+        alterarQtd(idx, d);
+      }
+    });
+
+    // ====== Ações dos botões em cards
+    function bindBotoesProdutos() {
+      botoesAdicionar().forEach(b => {
+        b.onclick = (e) => {
+          e.preventDefault();
+          const card = e.target.closest(".card");
+          const nome = card.querySelector("h3").textContent.trim();
+          const preco = card.querySelector("p").textContent.trim();
+          let item = itensCarrinho.find(i => i.nome === nome);
+          if (item) item.qtd++; else itensCarrinho.push({ nome, preco, qtd: 1 });
+          atualizarCarrinho();
+          carrinho.classList.add("ativo");
+          carrinho.setAttribute('aria-hidden', 'false');
+        };
+      });
+
+      botoesComprarAgora().forEach(b => {
+        b.onclick = (e) => {
+          e.preventDefault();
+          const card = e.target.closest(".card");
+          const nome = card.querySelector("h3").textContent.trim();
+          const preco = card.querySelector("p").textContent.trim();
+          itensCarrinho = [{ nome, preco, qtd: 1 }];
+          atualizarCarrinho();
+          carrinho.classList.add("ativo");
+          carrinho.setAttribute('aria-hidden', 'false');
+        };
+      });
+    }
+
+    // ====== Menu & Carrinho Toggles
+    abrirCarrinho.onclick = () => {
+      carrinho.classList.toggle("ativo");
+      carrinho.setAttribute('aria-hidden', carrinho.classList.contains('ativo') ? 'false' : 'true');
+    };
+    sairCarrinho.onclick = () => {
+      carrinho.classList.remove("ativo");
+      carrinho.setAttribute('aria-hidden', 'true');
+    };
+    comprarAgoraAnchor.onclick = (e) => { e.preventDefault(); carrinho.classList.add("ativo"); carrinho.setAttribute('aria-hidden','false'); };
+    abrirMenu.onclick = () => menuLateral.classList.toggle("ativo");
+
+    // ====== Finalização via WhatsApp
+    finalizarCompra.onclick = () => {
+      if (itensCarrinho.length === 0) { alert("Seu carrinho está vazio!"); return; }
+      const linhas = itensCarrinho.map(i => `• ${i.nome} (x${i.qtd}) - ${i.preco}`).join("\n");
+      const total = totalCarrinho.textContent;
+      const mensagem = `🛒 Pedido Ruas de Fortal:%0A%0A${encodeURIComponent(linhas)}%0A%0A${encodeURIComponent(total)}`;
+      const url = `https://wa.me/5516997033586?text=${mensagem}`;
+      window.open(url, "_blank", "noopener");
+    };
+
+    // ====== Busca de produtos
+    campoBusca.addEventListener('input', () => {
+      const termo = campoBusca.value.trim().toLowerCase();
+      document.querySelectorAll('#listaProdutos .card').forEach(card => {
+        const nome = (card.getAttribute('data-nome') || card.querySelector('h3').textContent).toLowerCase();
+        card.style.display = nome.includes(termo) ? '' : 'none';
+      });
+    });
+
+    // ====== Botões extras
+    btnSobre.onclick = () => modalSobre.classList.add("ativo");
+    fecharSobre.onclick = () => modalSobre.classList.remove("ativo");
+    modalSobre.addEventListener("click", (e) => { if (e.target === modalSobre) modalSobre.classList.remove("ativo"); });
+
+    btnNovidades.onclick = () => document.querySelector("#comprar").scrollIntoView({ behavior: "smooth" });
+    btnSuporte.onclick = () => window.open("https://wa.me/5516997033586?text=Preciso%20de%20ajuda%20com%20um%20pedido", "_blank", "noopener");
+    btnInstagram.onclick = () => window.open("https://www.instagram.com/souzz.s7", "_blank", "noopener");
+
+    // ====== Voltar ao topo
+    btnTopo.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // ====== Loader
+    window.addEventListener('load', () => {
+      setTimeout(() => { loader.style.display = 'none'; }, 250);
+    });
+
+    // ====== Boot
+    (function init() {
+      carregarLocal();
+      bindBotoesProdutos();
+      atualizarCarrinho();
+    })();
+  </script>
+</body>
+</html>

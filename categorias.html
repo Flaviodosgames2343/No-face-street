@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categorias - Império Streetwear</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #800020;
+    }
+
+    .btn-voltar {
+      display: inline-block;
+      margin-bottom: 2rem;
+      background-color: #800020;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background-color: #fff;
+      color: #800020;
+    }
+
+    .grid-produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: #111;
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: center;
+      padding-bottom: 1rem;
+    }
+
+    .card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .card h3 {
+      margin-top: 1rem;
+    }
+
+    .card p {
+      color: #bbb;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Botão de voltar -->
+  <a href="index.html" class="btn-voltar">⬅ Voltar</a>
+
+  <h1>Todas as Categorias</h1>
+
+  <div class="grid-produtos">
+    <div class="card">
+      <img src="Adobe Express - file.png" alt="Camiseta Streetwear">
+      <h3>Blusa Jersey</h3>
+      <p>R$ 129,90</p>
+    </div>
+
+    <div class="card">
+      <img src="selva.png" alt="Moletom Streetwear">
+      <h3>Moletom Império</h3>
+      <p>R$ 199,90</p>
+    </div>
+
+    <div class="card">
+      <img src="Adobe Express - file (1).png" alt="Calça Streetwear">
+      <h3>Calça Baggy</h3>
+      <p>R$ 179,90</p>
+    </div>
+  </div>
+</body>
+</html>
